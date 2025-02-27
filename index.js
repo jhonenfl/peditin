@@ -1,12 +1,17 @@
+/// Import resources ///
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 
 const app = express();
+
+
+/// Enable CORS and JSON FORMAT ///
 app.use(express.json());
+app.use(cors());
 
 
 /// Connect to Mongod Server ///
-
 const MONGO_URL = "mongodb://127.0.0.1:27017/fireflyWaifu";
 
 mongoose.connect(MONGO_URL)
@@ -23,7 +28,6 @@ app.listen(3000, () => {
 
 
 /// Created initial endpoint's ///
-
 app.post("/register", async (req, res) => {
   //created user
 });
