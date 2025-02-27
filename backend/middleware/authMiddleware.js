@@ -1,0 +1,1 @@
+// Verifica si el usuario está autenticado
