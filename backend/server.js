@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const connectDB = require('./config/database');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
+const postRoutes = require('./routes/post');
 
 dotenv.config();
 const app = express();
@@ -12,9 +13,12 @@ app.use(express.json());
 
 connectDB();
 
-app.use("/auth", authRoutes);
 
-app.listen(3000, () => console.log("Servidor running in http://localhost:3000"));
+app.use("/auth", authRoutes);
+app.use('/post', postRoutes);
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor running in http://localhost:${PORT}`));
 
 app.get('/', (req, res) => {
   res.send("MongoDB server connected!");
