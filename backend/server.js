@@ -5,6 +5,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
 const commentRoutes = require('./routes/comment');
+const userRoutes = require('./routes/user');
 
 dotenv.config();
 const app = express();
@@ -16,8 +17,9 @@ connectDB();
 
 
 app.use("/auth", authRoutes);
-app.use('/post', postRoutes);
+app.use('/posts', postRoutes);
 app.use('', commentRoutes);
+app.use('/users', userRoutes);
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Servidor running in http://localhost:${PORT}`));

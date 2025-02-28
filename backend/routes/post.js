@@ -1,6 +1,7 @@
 const express = require('express');
 const auth = require('../middleware/authMiddleware');
 const Post = require('../models/Post');
+const User = require('../models/User');
 
 const router = express.Router();
 
@@ -20,15 +21,18 @@ router.post('/', auth, async (req, res) => {
 
 
 // Load posts
-router.get('/', async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 }).populate('author', 'username');
+    const user = await User.findById(req.user._id).populate("following");
+    const posts = await Post.find({ author: { $in: user.following } }).sort({ createdAt: -1 }).populate('author', 'username');
+    if (posts[0] === undefined) return res.status(403).json({ error: "No post, follow users to see posts" });
     res.json(posts);
 
   } catch (error) {
     res.status(500).json({ error: "Error loading posts" });
   }
-})
+});
+
 
 // Find post by ID
 router.get('/:id', async (req, res) => {
@@ -40,7 +44,7 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error to found the post" });
   }
-})
+});
 
 
 // Delete a post
