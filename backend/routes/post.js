@@ -9,7 +9,7 @@ const router = express.Router();
 router.post('/', auth, async (req, res) => {
   try {
     const { content } = req.body;
-    const newPost = new Post({ content, author: req.user.id });
+    const newPost = new Post({ content, author: req.user._id });
     await newPost.save();
     res.status(201).json({ message: "Your post was upload succesfully", newPost });
 
@@ -56,6 +56,30 @@ router.delete('/:id', auth, async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ error: "Error to delete the post" });
+  }
+});
+
+
+// Like or Dislike for post
+router.post('/:id/like', auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) return res.status(404).json({ error: "Post not found" });
+
+    const userId = req.user._id;
+    const index = post.likes.indexOf(userId);
+
+    if (index === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes.splice(index, 1);
+    }
+    await post.save();
+
+    res.json({ message: "Like update", likes: post.likes.length });
+
+  } catch (error) {
+    res.status(500).json({ error: "Failed like/dislike"});
   }
 });
 
