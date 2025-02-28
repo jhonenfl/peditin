@@ -1,5 +1,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
+const auth = require('../middleware/authMiddleware');
 const User = require('../models/User');
 
 const router = express.Router();
@@ -44,7 +45,7 @@ router.get("/login", async (req, res) => {
 
 
 /// Protect route (example) ///
-router.get("/profile", verifyToken, async (req, res) => {
+router.get("/profile", auth, async (req, res) => {
   try {
     const user = User.findById(req.user.userId).select("-password");
     res.json(user);
@@ -53,21 +54,6 @@ router.get("/profile", verifyToken, async (req, res) => {
     res.status(500).json({ error: "Get profile failed" });
   }
 });
-
-
-/// Middleware to token verifier ///
-function verifyToken(req, res, next) {
-  const token = req.header("Authorization");
-  if (!token) return res.status(401).json({ error: "Denegade access" });
-
-  try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
-    next();
-  } catch (error) {
-    res.status(400).json({ error: "Invalid token" });
-  }
-}
 
 
 module.exports = router;
