@@ -61,5 +61,23 @@ router.get('/:id/following', auth, async (req, res) => {
   }
 });
 
+// Buscar a un usuario
+router.get('/search', auth, async (req, res) => {
+  try {
+    const userSearched = req.query.query;
+  
+    const userMatch = await User.find({ $or: [
+      { username: { $regex: userSearched, $options: "ix"} },
+      { email: { $regex: userSearched, $options: "ix"} }
+    ]});
+
+    if (userMatch[0] === undefined) return res.status(404).json({ error: "Users not found" });
+    res.json({ userMatch });
+
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 
 module.exports = router;
