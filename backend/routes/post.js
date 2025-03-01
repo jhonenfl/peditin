@@ -23,9 +23,19 @@ router.post('/', auth, async (req, res) => {
 // Load posts
 router.get('/', auth, async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
+
     const user = await User.findById(req.user._id).populate("following");
-    const posts = await Post.find({ author: { $in: user.following } }).sort({ createdAt: -1 }).populate('author', 'username');
+    const posts = await Post.find({ author: { $in: user.following } })
+      .sort({ createdAt: -1 })
+      .populate('author', 'username')
+      .skip(skip)
+      .limit(limit);
+
     if (posts[0] === undefined) return res.status(403).json({ error: "No post, follow users to see posts" });
+
     res.json(posts);
 
   } catch (error) {

@@ -58,16 +58,22 @@ router.delete('/comments/:id', auth, async (req, res) => {
 // Load comments
 router.get('/posts/:id/comments', async (req, res) => {
   try {
-    const post = await Post.findById(req.params.id)
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 2;
+    const skip = (page - 1) * limit;
+
+    const comment = await Post.findById(req.params.id)
       .populate("author", "username email")
       .populate({
         path: "comments",
+        limit: limit,
+        skip: skip,
         populate: { path: "author", select: "username email" }
       });
 
-    if (!post) return res.status(404).json({ error: "Post not found" });
+    if (!comment) return res.status(404).json({ error: "Post not found" });
 
-    res.json(post);
+    res.json(comment);
 
   } catch (error) {
     res.status(500).json({ error: error.message });
